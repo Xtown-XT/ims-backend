@@ -24,5 +24,4 @@ router.post("/user/verifyOTP", userController.verifyOtp);
 router.post("/user/resetPassword", userController.resetPassword);
 router.post("/user/changePassword",verifyToken, userController.changePassword);
 
-
 export default router;

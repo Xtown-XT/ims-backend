@@ -1,6 +1,5 @@
 import { DataTypes } from "sequelize";
 import { sequelize } from "../../../db/index.js";
-import { is } from "zod/v4/locales";
 
 const Categories = sequelize.define(
   "Categories",
@@ -13,10 +12,10 @@ const Categories = sequelize.define(
     },
     category_name: {
       type: DataTypes.STRING,
-      allowNull: false,  // ✅ Must NOT be null
+      allowNull: false,
       unique: true,
     },
-    description: {
+    category_slug: {
       type: DataTypes.TEXT,
       allowNull: true,
       defaultValue: null,
@@ -32,13 +31,24 @@ const Categories = sequelize.define(
     },
     updated_by: {
       type: DataTypes.UUID,
-      allowNull:true,
+      allowNull: true,
+    },
+
+    // ✅ ADD THESE FIELDS
+    created_on: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      defaultValue: DataTypes.NOW, // ✅ Fix error
+    },
+    updated_on: {
+      type: DataTypes.DATE,
+      allowNull: true,
     },
   },
   {
     tableName: "categories",
-    timestamps: false, 
-    paranoid :true
+    timestamps: false,
+    paraniod: true,
   }
 );
 

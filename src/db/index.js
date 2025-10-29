@@ -5,8 +5,8 @@ const Sequelize = SequelizePkg; // <-- fix here
 const { DataTypes, Op } = SequelizePkg;
 
 // Create Sequelize instance
-const sequelize = new Sequelize("ims_demo", "root", "Sanjay@1218", {
-  host: "127.0.0.1",
+const sequelize = new Sequelize("ims", "ramya", "ramya", {
+  host: "192.168.1.150",
   port: 3306,
   dialect: "mysql",
 });

@@ -122,10 +122,44 @@ export const createCategory = async (req, res) => {
 // Get All Categories
 export const getAllCategories = async (req, res) => {
   try {
+    const {
+      q: search = "",
+      page = 1,
+      limit = 10,
+      sortField = "created_on",
+      sortOrder = "DESC",
+    } = req.query ?? {};
+
+    // whitelist allowed sort fields
+    const allowedSortFields = [
+      "id",
+      "category_name",
+      "category_slug",
+      "created_by",
+      "created_on",
+    ];
+
+    const safeSortField = allowedSortFields.includes(sortField) ? sortField : "created_on";
+    const safeSortOrder = String(sortOrder).toUpperCase() === "ASC" ? "ASC" : "DESC";
+
+    // IMPORTANT: don't pass an attributes array that omits created_on.
+    // Either omit attributes so Sequelize returns all model fields (including created_on),
+    // or explicitly include created_on.
+    // I'm omitting attributes here so created_on will be present if the model defines it.
     const result = await categoryService.getAll({
       searchFields: ["category_name", "description"],
+      search: search || undefined,
+      page: Number(page) || 1,
+      limit: Number(limit) || 10,
+      orderBy: safeSortField, // service expects column name string
+      order: safeSortOrder,   // service expects "ASC" or "DESC"
+      // Do NOT pass attributes that would exclude created_on
     });
-    return res.status(200).json(result);
+
+    return res.status(200).json({
+      message: "Categories fetched successfully",
+      data: result,
+    });
   } catch (error) {
     return res.status(500).json({
       message: "Failed to fetch categories",
@@ -133,6 +167,11 @@ export const getAllCategories = async (req, res) => {
     });
   }
 };
+
+
+
+
+
 
 // Get Category by ID
 export const getCategoryById = async (req, res) => {

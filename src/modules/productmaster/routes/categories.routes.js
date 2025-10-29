@@ -8,7 +8,7 @@ import {
   updateCategorySchema,
   categoryIdSchema,
 } from "../dto/categories.zod.js";
-import { body } from "express-validator";
+
 
 const router = Router();
 
@@ -40,7 +40,7 @@ router.get(
 router.put(
   "/categories/:id",
   verifyToken,
-  authorizeRole(["admin", "superadmin"]), // only admins / superadmins can update
+  authorizeRole(["admin", "superadmin"]), 
   validate(updateCategorySchema),
   categoryController.updateCategory
 );
@@ -48,7 +48,7 @@ router.put(
 router.delete(
   "/categories/:id",
   verifyToken,
-  authorizeRole(["admin", "superadmin"]), // only admins / superadmins can delete
+  authorizeRole(["admin", "superadmin"]), 
   validate(categoryIdSchema, "params"),
   categoryController.deleteCategory
 );
