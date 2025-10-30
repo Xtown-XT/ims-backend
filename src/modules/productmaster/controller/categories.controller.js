@@ -95,6 +95,7 @@
 // };
 import BaseService   from "../../../services/service.js";
 import categories from "../models/categories.js"
+import { formatDates } from "../../../utils/dataFormatter.js";
 
 const categoryService = new BaseService(categories);
 // Create Category
@@ -122,43 +123,48 @@ export const createCategory = async (req, res) => {
 // Get All Categories
 export const getAllCategories = async (req, res) => {
   try {
+    // read optional query params (fall back to defaults)
     const {
-      q: search = "",
       page = 1,
       limit = 10,
-      sortField = "created_on",
-      sortOrder = "DESC",
-    } = req.query ?? {};
+      search = "",
+      orderBy = "category_name", // SAFE default column (string)
+      order = "ASC",             // ASC or DESC (string)
+      includeInactive = "false", // query params are strings
+    } = req.query;
 
-    // whitelist allowed sort fields
-    const allowedSortFields = [
-      "id",
-      "category_name",
-      "category_slug",
-      "created_by",
-      "created_on",
-    ];
+    // Convert includeInactive to boolean
+    const includeInactiveBool = includeInactive === "true";
 
-    const safeSortField = allowedSortFields.includes(sortField) ? sortField : "created_on";
-    const safeSortOrder = String(sortOrder).toUpperCase() === "ASC" ? "ASC" : "DESC";
-
-    // IMPORTANT: don't pass an attributes array that omits created_on.
-    // Either omit attributes so Sequelize returns all model fields (including created_on),
-    // or explicitly include created_on.
-    // I'm omitting attributes here so created_on will be present if the model defines it.
+    // Call BaseService with proper typed params (strings for orderBy/order)
     const result = await categoryService.getAll({
-      searchFields: ["category_name", "description"],
-      search: search || undefined,
-      page: Number(page) || 1,
-      limit: Number(limit) || 10,
-      orderBy: safeSortField, // service expects column name string
-      order: safeSortOrder,   // service expects "ASC" or "DESC"
-      // Do NOT pass attributes that would exclude created_on
+      includeInactive: includeInactiveBool,
+      search,
+      page: Number(page),
+      limit: Number(limit),
+      orderBy: String(orderBy),
+      order: String(order),
+      searchFields: ["category_name", "category_slug"],
     });
 
+    // BaseService returns { rows, count, page, limit, totalPages }
+    const { rows = [], count = 0, totalPages = 0 } = result;
+
+    // Convert Sequelize instances to plain objects safely
+    const toPlain = (item) => {
+      if (!item) return item;
+      if (typeof item.toJSON === "function") return item.toJSON();
+      return item;
+    };
+
+    const formattedRows = rows.map((r) => formatDates(toPlain(r)));
+
     return res.status(200).json({
-      message: "Categories fetched successfully",
-      data: result,
+      rows: formattedRows,
+      count,
+      page: Number(page),
+      limit: Number(limit),
+      totalPages,
     });
   } catch (error) {
     return res.status(500).json({
@@ -167,7 +173,6 @@ export const getAllCategories = async (req, res) => {
     });
   }
 };
-
 
 
 
