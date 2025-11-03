@@ -37,12 +37,8 @@ app.get('/api/error', (req, res) => {
 //routes
 app.use('/ims_api/v1', userRoutes);
 app.use('/ims_api/v1', categoriesRoutes);
-<<<<<<< HEAD
 app.use('/ims_api/v1', userManagementRoutes);
-=======
 app.use('/ims_api/v1', SubcategoriesRoutes);
-
->>>>>>> ded64cf8614e84b53106fcb55080043655e5618d
 
 
 
