@@ -7,7 +7,7 @@ import path from "path";
 
 import userRoutes from './modules/user/routes/index.js';
 import categoriesRoutes from './modules/productmaster/routes/index.js';
-
+import userManagementRoutes from './modules/employee/routes/index.js'
 const app = express();
 app.use(express.json());
 
@@ -36,7 +36,7 @@ app.get('/api/error', (req, res) => {
 //routes
 app.use('/ims_api/v1', userRoutes);
 app.use('/ims_api/v1', categoriesRoutes);
-
+app.use('/ims_api/v1', userManagementRoutes);
 
 
 
