@@ -1,15 +1,20 @@
 import { DataTypes } from "sequelize";
 import { sequelize } from "../../../db/index.js";
-import { ca } from "zod/v4/locales";
+import Categories from "../models/categories.js";
+
 const Subcategory = sequelize.define(
   "Subcategory",
   {
     id: {
-        type: DataTypes.UUID,
-        defaultValue: DataTypes.UUIDV4,
-        primaryKey: true,
-        allowNull: false,
-        },
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
+      primaryKey: true,
+      allowNull: false,
+    },
+    image: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
     subcategory_name: {
       type: DataTypes.STRING,
       allowNull: false,
@@ -18,37 +23,42 @@ const Subcategory = sequelize.define(
       type: DataTypes.UUID,
       allowNull: false,
       references: {
-        model: "Categories", // name of Target model
-        key: "id", // key in Target model that we're referencing
-      },    
+        model: "categories",
+        key: "id",
+      },
+      onUpdate: "CASCADE",
+      onDelete: "CASCADE",
     },
     category_code: {
       type: DataTypes.STRING,
-      allowNull: true,  
+      allowNull: true,
     },
-    Description:{
-        type: DataTypes.TEXT,
-        allowNull: true,
+    description: {
+      type: DataTypes.TEXT,
+      allowNull: true,
     },
     is_active: {
-      type: DataTypes.BOOLEAN,  
-        defaultValue: true,
-        allowNull: false,
+      type: DataTypes.BOOLEAN,
+      defaultValue: true,
+      allowNull: false,
     },
     created_by: {
-      type: DataTypes.UUID,
-        allowNull: true, 
+      type: DataTypes.STRING,
+      allowNull: true,
     },
     updated_by: {
-      type: DataTypes.UUID,
-        allowNull: true,
+      type: DataTypes.STRING,
+      allowNull: true,
     },
-},
+  },
   {
     tableName: "subcategories",
-    timestamps: false,
-    paraniod: true,
-    }
+    timestamps: true,
+    paranoid: true,
+  }
 );
-export default Subcategory;
 
+Categories.hasMany(Subcategory, { foreignKey: "category_id" });
+Subcategory.belongsTo(Categories, { foreignKey: "category_id" });
+
+export default Subcategory;

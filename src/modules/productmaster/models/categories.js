@@ -33,21 +33,10 @@ const Categories = sequelize.define(
       type: DataTypes.UUID,
       allowNull: true,
     },
-
-    // ✅ ADD THESE FIELDS
-    created_on: {
-      type: DataTypes.DATE,
-      allowNull: false,
-      defaultValue: DataTypes.NOW, // ✅ Fix error
-    },
-    updated_on: {
-      type: DataTypes.DATE,
-      allowNull: true,
-    },
   },
   {
     tableName: "categories",
-    timestamps: false,
+    timestamps:true,
     paraniod: true,
   }
 );
