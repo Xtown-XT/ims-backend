@@ -5,6 +5,9 @@ import helmet from 'helmet';
 import {responseHelper } from './middleware/index.js';
 import path from "path";
 
+import "./associations/index.js";
+
+
 import userRoutes from './modules/user/routes/index.js';
 import categoriesRoutes from './modules/productmaster/routes/index.js';
 import userManagementRoutes from './modules/employee/routes/index.js'

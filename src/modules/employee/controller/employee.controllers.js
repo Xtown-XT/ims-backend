@@ -31,9 +31,11 @@ export const createEmployee = async (req, res) => {
       phone,
       password, // hash in middleware ideally
       role_id: role_id || null,
-      profile_picture: req.file
-        ? `/uploads/employees/${req.file.filename}`
-        : null,
+      // profile_picture: req.file
+      //   ? `/uploads/employees/${req.file.filename}`
+      //   : null,
+      profile_picture: req.file ? req.file.filename : null,
+
       created_by: req.user?.id || "system",
     };
 
@@ -65,7 +67,9 @@ export const updateEmployee = async (req, res) => {
     };
 
     if (req.file) {
-      payload.profile_picture = `/uploads/employees/${req.file.filename}`;
+      // payload.profile_picture = `/uploads/employees/${req.file.filename}`;
+      payload.profile_picture = req.file ? req.file.filename : null
+
     }
 
     const updatedEmployee = await employeeService.update(id, payload);
@@ -93,7 +97,6 @@ export const updateEmployee = async (req, res) => {
 export const getAllEmployees = async (req, res) => {
   try {
     const { search = "", page = 1, limit = 10, orderBy = "createdAt", order = "ASC" } = req.query;
-
     const offset = (page - 1) * limit;
 
     const whereClause = search
@@ -108,15 +111,30 @@ export const getAllEmployees = async (req, res) => {
 
     const { rows, count } = await Employee.findAndCountAll({
       where: whereClause,
-      include: [{ model: Role, attributes: ["id", "role_name"] }],
+      include: [
+        {
+          model: Role,
+          as: "role",
+          attributes: ["id", "role_name"],
+        },
+      ],
       order: [[orderBy, order]],
       limit: parseInt(limit),
       offset: parseInt(offset),
     });
 
+    // ✅ Build full URL for profile pictures
+    const baseUrl = `${req.protocol}://${req.get("host")}`; // e.g., http://localhost:5000
+    const formattedRows = rows.map(emp => ({
+      ...emp.toJSON(),
+      profile_picture: emp.profile_picture
+        ? `${baseUrl}/uploads/employees/${emp.profile_picture}`
+        : null,
+    }));
+
     return res.status(200).json({
       message: "Employees fetched successfully",
-      data: rows,
+      data: formattedRows,
       total: count,
       page: parseInt(page),
       totalPages: Math.ceil(count / limit),
@@ -130,25 +148,30 @@ export const getAllEmployees = async (req, res) => {
   }
 };
 
-// ============================================================
-// 🔹 Get Employee By ID
-// ============================================================
 export const getEmployeeById = async (req, res) => {
   try {
     const { id } = req.params;
-
     const employee = await Employee.findOne({
       where: { id },
-      include: [{ model: Role, attributes: ["id", "role_name"] }],
+      include: [
+        { model: Role, as: "role", attributes: ["id", "role_name"] },
+      ],
     });
 
-    if (!employee) {
+    if (!employee)
       return res.status(404).json({ message: "Employee not found" });
-    }
+
+    const baseUrl = `${req.protocol}://${req.get("host")}`;
+    const employeeData = {
+      ...employee.toJSON(),
+      profile_picture: employee.profile_picture
+        ? `${baseUrl}/uploads/employees/${employee.profile_picture}`
+        : null,
+    };
 
     return res.status(200).json({
       message: "Employee fetched successfully",
-      data: employee,
+      data: employeeData,
     });
   } catch (error) {
     console.error("❌ Error fetching employee:", error);
@@ -184,10 +207,68 @@ export const deleteEmployee = async (req, res) => {
   }
 };
 
+
+ // ✅ Login Employee
+ export const emplogin =  async (req, res) => {
+    try {
+      const { username, password } = req.body;
+
+      const employee = await Employee.findOne({ where: { username } });
+      if (!employee) {
+        return res.status(404).json({ message: "Employee not found" });
+      }
+
+      const isMatch = await bcrypt.compare(password, employee.password);
+      if (!isMatch) {
+        return res.status(401).json({ message: "Invalid password" });
+      }
+
+      // Generate JWT token
+      const token = jwt.sign(
+        {
+          id: employee.id,
+          username: employee.username,
+          role: employee.role,
+        },
+        JWT_SECRET,
+        { expiresIn: "1d" }
+      );
+
+      res.status(200).json({
+        message: "Login successful",
+        token,
+        user: {
+          id: employee.id,
+          username: employee.username,
+          email: employee.email,
+          role: employee.role,
+        },
+      });
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  }
+
+  // ✅ Get Profile
+  export const getEmpProfile =  async (req, res) => {
+    try {
+      const employee = await Employee.findByPk(req.user.id, {
+        attributes: ["id", "username", "email", "phone", "role"],
+      });
+      res.status(200).json({ data: employee });
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  }
+
+
 export default {
   createEmployee,
   updateEmployee,
   getAllEmployees,
   getEmployeeById,
   deleteEmployee,
+  emplogin,
+  getEmpProfile
+
 };

@@ -1,4 +1,5 @@
-import { DataTypes, Op } from "sequelize";
+import { DataTypes } from "sequelize";
+import bcrypt from "bcryptjs"; // 👈 import bcrypt for hashing
 import { sequelize } from "../../../db/index.js";
 
 const Employee = sequelize.define(
@@ -83,7 +84,27 @@ const Employee = sequelize.define(
     paranoid: true, // soft delete
     deletedAt: "deleted_at",
 
-    }
+    // ✅ Password hashing hooks
+    hooks: {
+      beforeCreate: async (employee) => {
+        if (employee.password) {
+          const salt = await bcrypt.genSalt(10);
+          employee.password = await bcrypt.hash(employee.password, salt);
+        }
+      },
+      beforeUpdate: async (employee) => {
+        if (employee.changed("password")) {
+          const salt = await bcrypt.genSalt(10);
+          employee.password = await bcrypt.hash(employee.password, salt);
+        }
+      },
+    },
+  }
 );
+
+// ✅ Optional: Compare password helper
+Employee.prototype.comparePassword = async function (password) {
+  return bcrypt.compare(password, this.password);
+};
 
 export default Employee;

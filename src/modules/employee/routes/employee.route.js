@@ -3,7 +3,7 @@ import { Router } from "express";
 import employeeController from "../controller/employee.controllers.js";
 import { verifyToken, authorizeRole } from "../../../middleware/index.js";
 import { validate } from "../../../middleware/validate.js";
-import { upload } from "../../../middleware/upload.js";
+import { uploadSingle } from "../../../middleware/upload.js";
 import {
   createEmployeeSchema,
   updateEmployeeSchema,
@@ -17,7 +17,7 @@ router.post(
   "/createEmployee",
   verifyToken,
   authorizeRole(["admin", "superadmin", "hr"]),
-  upload.single("profile_picture"),
+  uploadSingle("profile_picture", "employees"),
   validate(createEmployeeSchema),
   employeeController.createEmployee
 );
@@ -44,7 +44,7 @@ router.put(
   "/updateEmployee/:id",
   verifyToken,
   authorizeRole(["admin", "superadmin", "hr"]),
-  upload.single("profile_picture"),
+ uploadSingle("profile_picture", "employees"),
   validate(updateEmployeeSchema),
   employeeController.updateEmployee
 );
