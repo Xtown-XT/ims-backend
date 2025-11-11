@@ -12,6 +12,7 @@ import userRoutes from './modules/user/routes/index.js';
 import categoriesRoutes from './modules/productmaster/routes/index.js';
 import userManagementRoutes from './modules/employee/routes/index.js'
 import SubcategoriesRoutes from './modules/productmaster/routes/index.js';
+import warehouseRoutes from "./modules/warehousemaster/routes/index.js";
 const app = express();
 app.use(express.json());
 
@@ -42,6 +43,7 @@ app.use('/ims_api/v1', userRoutes);
 app.use('/ims_api/v1', categoriesRoutes);
 app.use('/ims_api/v1', userManagementRoutes);
 app.use('/ims_api/v1', SubcategoriesRoutes);
+app.use('/ims_api/v1', warehouseRoutes);
 
 
 
