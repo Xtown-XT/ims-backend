@@ -22,25 +22,47 @@ export const createwarehouse = async (req, res)=>{
     // get all warehouse
 
     export const getAllwarehouse = async (req,res)=>{
-  try {
+ try {
+    const {
+      search = "",
+      page = 1,
+      limit = 10,
+      orderBy = "createdAt",
+      order = "ASC"
+    } = req.query;
+
+    // 🔥 Convert to proper types
+    const pageNumber = Number(page);
+    const limitNumber = Number(limit);
+
+    // 🔍 Validate order direction
+    const sortOrder = ["ASC", "DESC"].includes(order.toUpperCase())
+      ? order.toUpperCase()
+      : "ASC";
+
+    // 🔐 Only allow safe columns to be used for sorting
+    const allowedOrderBy = ["createdAt", "updatedAt", "warehouse_name", "city", "state", "country"];
+    const sortField = allowedOrderBy.includes(orderBy) ? orderBy : "createdAt";
+
     const result = await warehouseService.getAll({
-      search: req.query.search || "",
-      page: req.query.page || 1,
-      limit: req.query.limit || 10,
-      orderBy: req.query.orderBy || "createdAt",
-      order: req.query.order || "ASC",
+      search,
+      page: pageNumber,
+      limit: limitNumber,
+      orderBy: sortField,
+      order: sortOrder,
       searchFields: ["warehouse_name", "city", "state", "country"],
     });
 
     res.status(200).json({
-      message: "Warehouse fetched successfully",
+      message: "Warehouses fetched successfully",
       data: result,
     });
+
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    console.error("Error fetching warehouses:", error);
+    res.status(500).json({ message: "Internal server error", error: error.message });
   }
 };
-
 
 // get warehouse by id
 

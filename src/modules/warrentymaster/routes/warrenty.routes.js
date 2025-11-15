@@ -21,12 +21,12 @@ router.post("/createWarranty",verifyToken,authorizeRole(["admin", "superadmin", 
 router.get("/getAllWarranties",verifyToken,authorizeRole(["admin", "superadmin", "user"]),getAllWarranties);
 
 // // 🟣 Get warranty by ID
-router.get("/:id",verifyToken,authorizeRole(["admin", "superadmin", "user"]), getWarrantyById);
+router.get("/getWarrantyById/:id",verifyToken,authorizeRole(["admin", "superadmin", "user"]), getWarrantyById);
 
 // // 🟠 Update warranty
-router.put("/:id",verifyToken,authorizeRole(["admin", "superadmin", "user"]), validate(warrantyUpdateSchema), updateWarranty);
+router.put("/updateWarranty/:id",verifyToken,authorizeRole(["admin", "superadmin", "user"]), validate(warrantyUpdateSchema), updateWarranty);
 
 // // 🔴 Delete warranty
-router.delete("/:id",verifyToken,authorizeRole(["admin", "superadmin", "user"]), deleteWarranty);
+router.delete("/deleteWarranty/:id",verifyToken,authorizeRole(["admin", "superadmin", "user"]), deleteWarranty);
 
 export default router;

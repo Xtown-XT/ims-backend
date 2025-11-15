@@ -43,7 +43,7 @@ router.get(
  * 🔍 Get warehouse by ID
  */
 router.get(
-  "/getwarehouse/:id",
+  "/getwarehouseByid/:id",
   verifyToken,
   authorizeRole(["admin", "superadmin", "hr", "manager"]),
   getwarehouseByid // ✅ removed unnecessary validation

@@ -114,16 +114,28 @@ export const getvariantById = async(req,res)=>{
 export const deleteVariant = async (req, res) => {
   try {
     const { id } = req.params;
+
     const deletedVariant = await variantService.delete(id);
 
-    res.status(200).json({
-      message: "Variant deleted successfully",
-      data: deletedVariant,
+    // If variant not found → return 404
+    if (!deletedVariant) {
+      return res.status(404).json({
+        status: "error",
+        message: "Variant not found"
+      });
+    }
+
+    return res.status(200).json({
+      status: "success",
+      message: "Variant deleted successfully"
     });
+
   } catch (error) {
-    console.error("Error deleting variant:", error);
-    res.status(500).json({ message: "Internal server error", error: error.message });
+    console.error("❌ Error deleting variant:", error);
+    return res.status(500).json({
+      status: "error",
+      message: "Internal server error",
+      error: error.message
+    });
   }
 };
-
-
