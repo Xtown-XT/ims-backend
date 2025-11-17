@@ -1,6 +1,6 @@
 import { Op } from "sequelize";
 import BaseService from "../../../services/service.js";
-import Subcategory from "../models/subcategory.js";
+import Subcategory from "../models/subcategory.model.js";
 // import { uploadSingle } from "../../../middleware/upload.js";
 
 const subcategoryService = new BaseService(Subcategory);

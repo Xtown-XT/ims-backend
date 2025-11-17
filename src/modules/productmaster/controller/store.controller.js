@@ -1,4 +1,4 @@
-import Store from "../../productmaster/models/store.models.js";
+import Store from "../models/store.model.js";
 
 const storeController = {
   // 🔹 Create

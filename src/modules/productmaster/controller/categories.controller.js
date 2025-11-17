@@ -94,7 +94,7 @@
 //   deleteCategory,
 // };
 import BaseService   from "../../../services/service.js";
-import categories from "../models/categories.js"
+import categories from "../models/categories.model.js"
 import { formatDates } from "../../../utils/dataFormatter.js";
 
 const categoryService = new BaseService(categories);

@@ -1,6 +1,7 @@
 import { DataTypes } from "sequelize";
 import { sequelize } from "../../../db/index.js";
-import Categories from "./categories.js";
+
+import Categories from "./categories.model.js";
 
 const Subcategory = sequelize.define("Subcategory", {
   id: {
