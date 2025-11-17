@@ -16,17 +16,20 @@ import warehouseRoutes from "./modules/warehousemaster/routes/index.js";
 import WarrantyRoutes from "./modules/warrentymaster/routes/index.js"
 import varrientRoutes from "./modules/varrientmaster/Routes/index.js";
 import taxRoutes from "./modules/taxmaster/routes/index.js";
+import addfinance from "./modules/finance and accounts/routes/index.js"
 
 
 
 const app = express();
 app.use(express.json());
-
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cors());
 app.use(morgan('dev'));
-app.use(helmet());
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: "cross-origin" }
+}));
+
 app.use(responseHelper);
 
 app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
@@ -53,6 +56,7 @@ app.use('/ims_api/v1', warehouseRoutes);
 app.use('/ims_api/v1', WarrantyRoutes);
 app.use("/ims_api/v1", varrientRoutes);
 app.use("/ims_api/v1", taxRoutes)
+app.use("/ims_api/v1", addfinance)
 
 
 
